@@ -1,0 +1,9 @@
+# Vagrant files
+.vagrant
+
+# swap files
+*.swp
+
+# python
+*.pyc
+.cache
