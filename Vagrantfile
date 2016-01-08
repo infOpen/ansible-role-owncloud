@@ -8,7 +8,8 @@ VAGRANTFILE_API_VERSION = "2"
 # meta/main.yml)
 VMS = {
   :trusty => {
-    :box => "ubuntu/trusty64"
+    :box => "ubuntu/trusty64",
+    :host_port => 8080
   }
 }
 
@@ -20,6 +21,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Set proper box
       vm_config.vm.box = options[:box]
+
+      # Add a forwarded port to connect to guest web ui
+      vm_config.vm.network "forwarded_port", \
+        guest: 80, \
+        host: options[:host_port]
   
       # Update system and install requirements
       vm_config.vm.provision "shell" do |sh|

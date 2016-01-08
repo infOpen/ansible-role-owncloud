@@ -1,0 +1,62 @@
+---
+
+# This file manage owncloud installation for Ubuntu distribution
+
+# Due to a bug with SNI only fix for python >= 2.7.9, only applicable > 14.04
+- name: Add GPG key with apt_key module
+  become: True
+  apt_key:
+    id: "{{ owncloud_repository_key_id }}"
+    url: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ owncloud_repository_key_url }}"
+    - "{{ owncloud_repository_apt_key_url }}"
+  when:
+    - (ansible_distribution_version|version_compare('14.04', '>'))
+    - (item != '')
+  until: (item != '')
+
+
+# Workaround for SNI Python management
+- name: Add GPG key with curl
+  become: True
+  shell: "/usr/bin/curl {{ item }} \
+            | /usr/bin/apt-key \
+              --keyring /etc/apt/trusted.gpg.d/owncloud.gpg add -"
+  args:
+    creates: /etc/apt/trusted.gpg.d/owncloud.gpg
+  with_items:
+    - "{{ owncloud_repository_key_url }}"
+    - "{{ owncloud_repository_apt_key_url }}"
+  when:
+    - (ansible_distribution_version|version_compare('14.04', '<='))
+    - (item != '')
+  until: (item != '')
+
+
+- name: Add owncloud repository
+  become: True
+  template:
+    src: "{{ role_path }}/templates/apt_repository.list.j2"
+    dest: "/etc/apt/sources.list.d/{{ owncloud_repository_file_name }}"
+    owner: "{{ owncloud_repository_file_owner }}"
+    group: "{{ owncloud_repository_file_group }}"
+    mode: "{{ owncloud_repository_file_mode }}"
+  with_items:
+    - "{{ owncloud_repository_source_url }}"
+    - "{{ owncloud_repository_apt_source_url }}"
+  when: (item != '')
+  until: (item != '')
+
+
+- name: Install packages
+  become: True
+  apt:
+    name: "{{ item }}"
+    state: "{{ owncloud_package_state }}"
+    update_cache: True
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  with_items: "{{ owncloud_packages }}"
+

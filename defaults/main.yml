@@ -2,3 +2,20 @@
 
 # Defaults vars file for owncloud role
 
+# Installation variables
+#-----------------------
+owncloud_repository_key_id: 'BCECA90325B072AB1245F739AB7C32C35180350A'
+
+# Repository urls can be customized, else default distribution used
+owncloud_repository_key_url: ''
+owncloud_repository_source_url: ''
+
+owncloud_repository_file_name: 'owncloud.list'
+owncloud_repository_file_owner: 'root'
+owncloud_repository_file_group: 'root'
+owncloud_repository_file_mode: '0644'
+
+owncloud_version: 8.2
+owncloud_package_state: 'present'
+owncloud_webserver_service_name: 'apache2'
+
