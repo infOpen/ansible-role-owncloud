@@ -50,13 +50,8 @@
   until: (item != '')
 
 
-- name: Install packages
+- name: Update apt cache
   become: True
   apt:
-    name: "{{ item }}"
-    state: "{{ owncloud_package_state }}"
     update_cache: True
-  environment:
-    DEBIAN_FRONTEND: noninteractive
-  with_items: "{{ owncloud_packages }}"
 
