@@ -26,14 +26,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vm_config.vm.network "forwarded_port", \
         guest: 80, \
         host: options[:host_port]
-  
+
       # Update system and install requirements
       vm_config.vm.provision "shell" do |sh|
         sh.inline = "sudo apt-get update \
                       && sudo apt-get install python-pip curl -y \
                       && sudo pip install ansible pytest"
       end
-  
+
       # Run pytest tests for filter plugins
       vm_config.vm.provision "shell" do |sh|
         sh.inline = "cd /vagrant \
@@ -41,12 +41,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       && py.test -v"
         sh.privileged = false
       end
-  
+
+      # Use trigger plugin to set environment variable used by Ansible
+      # Needed with 2.0 home path change
+      vm_config.vm.provision "trigger" do |trigger|
+        trigger.fire do
+          ENV['ANSIBLE_ROLES_PATH'] = '../'
+        end
+      end
+
       # Run Ansible provisioning
       vm_config.vm.provision "ansible" do |ansible|
         ansible.playbook  = "tests/test_vagrant.yml"
       end
-  
+
       # Run Serverspec tests
       vm_config.vm.provision "serverspec" do |serverspec|
         serverspec.pattern = 'spec/*_spec.rb'
