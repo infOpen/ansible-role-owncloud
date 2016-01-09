@@ -2,17 +2,15 @@
 
 # Ubuntu distribution vars
 
-owncloud_repository_apt_base: "{{ 'https://download.owncloud.org/download'
-                                    ~ '/repositories/' }}"
-owncloud_repository_apt_source_url: "{{ owncloud_repository_apt_base
+# OwnCloud APT repository URL
+owncloud_repository_apt_source_url: "{{ owncloud_repository_base_url
                                         ~ owncloud_version
                                         ~ '/Ubuntu_'
                                         ~ ansible_distribution_version }}/"
-owncloud_repository_apt_key_url: "{{ owncloud_repository_apt_base
-                                      ~ owncloud_version
-                                      ~ '/Ubuntu_'
-                                      ~ ansible_distribution_version
-                                      ~ '/Release.key' }}"
+
+# Owncloud GPG key URL for distribution
+owncloud_repository_apt_key_url: "{{ owncloud_repository_apt_source_url
+                                      ~ 'Release.key' }}"
 owncloud_packages:
   - owncloud
   - owncloud-server
