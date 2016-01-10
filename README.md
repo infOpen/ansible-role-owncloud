@@ -112,6 +112,19 @@ This role contains two tests methods :
         use_ssl: True
         port: 443
 
+    # Database configuration
+    #------------------------
+    owncloud_database_managed_by_this_role: True
+
+    owncloud_database_collation: 'utf8_unicode_ci'
+    owncloud_database_encoding: 'utf8'
+    owncloud_database_engine: 'mysql'
+    owncloud_database_name: 'owncloud'
+    owncloud_database_host: 'localhost'
+    owncloud_database_user: 'owncloud'
+    owncloud_database_password: ''
+    owncloud_database_table_prefix: ''
+
 ### Ubuntu distribution vars
 
     # OwnCloud APT repository URL
@@ -152,6 +165,21 @@ This role contains two tests methods :
           owner: 'root'
           group: 'root'
           mode: '0644'
+
+    # All distribution settings about database server management
+    owncloud_database_management:
+      - name: 'mysql'
+        files:
+          - type: 'configuration'
+            dest: '/etc/mysql/conf.d/owncloud.cnf'
+            owner: 'root'
+            group: 'root'
+            mode: '0600'
+        packages:
+          - 'mysql-server'
+          - 'php5-mysql'
+          - 'python-mysqldb'
+        socket: '/var/run/mysqld/mysqld.sock'
 
 ## Dependencies
 
