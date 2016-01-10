@@ -178,7 +178,7 @@
 
 - name: add debug
   become: True
-  shell: "cat /etc/ssl/certs/owncloud.pem"
+  shell: "openssl rsa -in /etc/ssl/private/owncloud.key -check -noout"
   register: debug_3
 
 - name: add debug
@@ -194,7 +194,4 @@
 
 - debug:
     var: debug_3
-
-- debug:
-    var: debug_4
 
