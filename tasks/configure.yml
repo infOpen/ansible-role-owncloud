@@ -13,16 +13,6 @@
     - item.name == owncloud_webserver_name
 
 
-- debug:
-    var: owncloud_check_installed
-
-- command: "ls -la {{ owncloud_www_directory }}/config/"
-  become: True
-  register: travis_debug
-
-- debug:
-    var: travis_debug
-
 - name: Configure owncloud after first installation
   become: True
   become_user: "{{ item.user }}"
@@ -43,7 +33,8 @@
   with_items: owncloud_webserver_management
   when:
     - item.name == owncloud_webserver_name
-    - owncloud_check_installed.results.0.stat.size == 0
+    - (owncloud_check_installed.results.0.stat.exists == False)
+      or (owncloud_check_installed.results.0.stat.size == 0)
 
 
 - name: Check if Owncloud already to latest version
