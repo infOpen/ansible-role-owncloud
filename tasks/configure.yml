@@ -1,0 +1,64 @@
+---
+
+# Owncloud configuration tasks
+
+- name: Check if Owncloud already installed
+  become: True
+  become_user: "{{ item.user }}"
+  shell: "php occ status | grep -c 'installed: true'"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  changed_when: False
+  register: owncloud_check_installed
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Configure owncloud after first installation
+  become: True
+  become_user: "{{ item.user }}"
+  command: "php occ maintenance:install \
+              --admin-user {{ owncloud_administrator_user }} \
+              --admin-pass {{ owncloud_administrator_password }} \
+              --database {{ owncloud_database_engine }} \
+              --database-name {{ owncloud_database_name }} \
+              --database-user {{ owncloud_database_user }} \
+              --database-pass {{
+                  owncloud_database_password
+                  or lookup(
+                    'password',
+                    '/tmp/' ~ owncloud_database_user ~ '_mysqlpassword') }} \
+              --data-dir {{ owncloud_data_directory }}"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+    - owncloud_check_installed.results.0.stdout != '1'
+
+
+- name: Check if Owncloud already to latest version
+  become: True
+  become_user: "{{ item.user }}"
+  shell: "php occ upgrade --dry-run | grep -c 'already latest version'"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  changed_when: False
+  register: owncloud_check_upgrade
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Upgrade owncloud if not latest version installed
+  become: True
+  become_user: "{{ item.user }}"
+  command: "php occ upgrade"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+    - owncloud_check_upgrade.results.0.stdout != '1'
+

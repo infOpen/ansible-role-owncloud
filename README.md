@@ -61,6 +61,8 @@ This role contains two tests methods :
     #==========================================================================
     owncloud_data_directory: '/var/www/owncloud/data'
     owncloud_www_directory: '/var/www/owncloud'
+    owncloud_administrator_user: 'admin'
+    owncloud_administrator_password: 'admin'
 
 
     # ADDITIONAL PACKAGES MANAGEMENT
@@ -161,6 +163,7 @@ This role contains two tests methods :
         required_modules:
           - 'ssl'
         service_name: 'apache2'
+        user: 'www-data'
         vhost_file:
           owner: 'root'
           group: 'root'

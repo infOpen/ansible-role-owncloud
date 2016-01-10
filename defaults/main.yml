@@ -27,6 +27,8 @@ owncloud_package_state: 'present'
 #==============================================================================
 owncloud_data_directory: '/var/www/owncloud/data'
 owncloud_www_directory: '/var/www/owncloud'
+owncloud_administrator_user: 'admin'
+owncloud_administrator_password: 'admin'
 
 
 # ADDITIONAL PACKAGES MANAGEMENT

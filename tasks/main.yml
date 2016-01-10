@@ -43,3 +43,10 @@
   when:
     - owncloud_database_managed_by_this_role
 
+
+- name: Include configuration tasks
+  include: "{{role_path }}/tasks/configure.yml"
+  tags:
+    - configure
+    - owncloud
+

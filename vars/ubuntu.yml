@@ -42,6 +42,7 @@ owncloud_webserver_management:
       - 'rewrite'
       - 'ssl'
     service_name: 'apache2'
+    user: 'www-data'
     vhost_file:
       owner: 'root'
       group: 'root'
