@@ -23,10 +23,7 @@ describe 'owncloud Ansible role' do
 
                 # Check all default endpoints removed
                 removed_endpoints = Array[
-                    '/etc/apache2/sites-available/000-default.conf',
-                    '/etc/apache2/sites-available/default-ssl.conf',
                     '/etc/apache2/sites-enabled/000-default.conf',
-                    '/etc/apache2/conf-available/owncloud.conf',
                     '/etc/apache2/conf-enabled/owncloud.conf'
                 ]
 
