@@ -37,8 +37,6 @@ owncloud_www_directory: '/var/www/owncloud'
 owncloud_webserver_managed_by_this_role: True
 
 owncloud_webserver_cn: ''
-owncloud_webserver_modules_required:
-  - ssl
 owncloud_webserver_name: 'apache' # Only Apache managed today
 owncloud_webserver_packages_state: 'present'
 owncloud_webserver_remove_existing_endpoints: True

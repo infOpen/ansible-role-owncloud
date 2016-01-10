@@ -91,14 +91,18 @@
     - owncloud_webserver_use_only_ssl
 
 
-- name: Activate required modules
+- name: Activate Apache required modules
   become: True
   apache2_module:
-    name: "{{ item }}"
+    name: "{{ item.1 }}"
     state: present
   notify: restart webserver
-  with_items: owncloud_webserver_modules_required
-  when: owncloud_webserver_name == 'apache'
+  with_subelements:
+    - owncloud_webserver_management
+    - required_modules
+  when:
+    - owncloud_webserver_name == 'apache'
+    - item.0.name == owncloud_webserver_name
 
 
 - name: Create SSL CA certificate directory

@@ -71,8 +71,6 @@ This role contains two tests methods :
     owncloud_webserver_managed_by_this_role: True
 
     owncloud_webserver_cn: ''
-    owncloud_webserver_modules_required:
-      - ssl
     owncloud_webserver_name: 'apache' # Only Apache managed today
     owncloud_webserver_packages_state: 'present'
     owncloud_webserver_remove_existing_endpoints: True
@@ -133,22 +131,22 @@ This role contains two tests methods :
 
     # All distribution settings about webserver management
     owncloud_webserver_management:
-      - name: apache
+      - name: 'apache'
+        default_site_endpoints:
+          - '000-default'
+        default_conf_endpoints:
+          - 'owncloud'
         folders:
           conf_enabled: '/etc/apache2/conf-enabled'
           site_enabled: '/etc/apache2/site-enabled'
           vhost_destination: '/etc/apache2/sites-available'
           vhost_symlink_destination: '/etc/apache2/sites-enabled'
         packages:
-          - apache2
-        default_endpoints:
-          - '/etc/apache2/sites-available/000-default.conf'
-          - '/etc/apache2/sites-available/default-ssl.conf'
-          - '/etc/apache2/sites-enabled/000-default.conf'
-          - '/etc/apache2/conf-available/owncloud.conf'
-          - '/etc/apache2/conf-enabled/owncloud.conf'
+          - 'apache2'
         port_configuration_files:
           - '/etc/apache2/ports.conf'
+        required_modules:
+          - 'ssl'
         service_name: 'apache2'
         vhost_file:
           owner: 'root'
