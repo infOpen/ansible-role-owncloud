@@ -13,6 +13,16 @@
     - item.name == owncloud_webserver_name
 
 
+- debug:
+    var: owncloud_check_installed
+
+- command: "ls -la {{ owncloud_www_directory }}/config/"
+  become: True
+  register: travis_debug
+
+- debug:
+    var: travis_debug
+
 - name: Configure owncloud after first installation
   become: True
   become_user: "{{ item.user }}"
