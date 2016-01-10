@@ -8,4 +8,6 @@
     - "infOpen/ansible-role-owncloud"
   post_tasks:
     - include: ./test_common.yml
+  vars:
+    owncloud_webserver_cn: foobar
 

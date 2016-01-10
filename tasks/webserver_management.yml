@@ -15,16 +15,6 @@
     - item.0.name == owncloud_webserver_name
 
 
-# Not needed, but Travis return permission denied :/
-- name: Add debug
-  become: True
-  command: "ls -lhaR /etc/apache2"
-  changed_when: False
-  register: travis_debug_1
-- debug:
-    var: travis_debug_1
-
-
 - name: Disable default site endpoints
   become: True
   command: "a2dissite {{ item.1 }}"
