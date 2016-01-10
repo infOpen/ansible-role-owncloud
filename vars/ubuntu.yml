@@ -31,9 +31,15 @@ owncloud_webserver_management:
       vhost_symlink_destination: '/etc/apache2/sites-enabled'
     packages:
       - 'apache2'
+      - 'libapache2-mod-php5'
     port_configuration_files:
       - '/etc/apache2/ports.conf'
     required_modules:
+      - 'dir'
+      - 'env'
+      - 'headers'
+      - 'mime'
+      - 'rewrite'
       - 'ssl'
     service_name: 'apache2'
     vhost_file:
