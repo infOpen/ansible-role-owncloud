@@ -55,5 +55,5 @@ script:
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Run serverspec tests
-  - bundle exec rake
+  - sudo bundle exec rake
 
