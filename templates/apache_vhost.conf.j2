@@ -1,0 +1,41 @@
+# {{ ansible_managed }}
+
+# This is the OwnCloud Apache virtualhost(s)
+{% for vhost in owncloud_webserver_vhosts %}
+<VirtualHost {{ vhost.ip }}:{{ vhost.port }}>
+
+{% if vhost.use_ssl %}
+    SSLEngine on
+    SSLCertificateFile {{ owncloud_webserver_ssl_certificate.directory.name
+                            ~ '/'
+                            ~ owncloud_webserver_ssl_certificate.file.name }}
+    SSLCertificateKeyFile {{ owncloud_webserver_ssl_private_key.directory.name
+                              ~ '/'
+                              ~ owncloud_webserver_ssl_private_key.file.name }}
+{% endif %}
+    DocumentRoot {{ owncloud_www_directory }}
+    ServerName {{ vhost.name }}
+{% if vhost.alias %}
+    ServerAlias {{ vhost.alias | join(' ') }}
+{% endif %}
+
+    <Directory "{{ owncloud_www_directory }}">
+        Options +FollowSymLinks
+        AllowOverride All
+
+        <IfModule mod_dav.c>
+          Dav off
+        </IfModule>
+
+        SetEnv HOME {{ owncloud_www_directory }}
+        SetEnv HTTP_HOME {{ owncloud_www_directory }}
+    </Directory>
+
+    <Directory "{{ owncloud_data_directory }}">
+        # just in case if .htaccess gets disabled
+        Require all denied
+    </Directory>
+
+</VirtualHost>
+{% endfor %}
+

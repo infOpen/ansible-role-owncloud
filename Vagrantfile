@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Add a forwarded port to connect to guest web ui
       vm_config.vm.network "forwarded_port", \
-        guest: 80, \
+        guest: 443, \
         host: options[:host_port]
 
       # Update system and install requirements

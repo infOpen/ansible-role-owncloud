@@ -22,3 +22,61 @@ owncloud_repository_file_mode: '0644'
 owncloud_version: 8.2
 owncloud_package_state: 'present'
 
+
+# GENERAL CONFIGURATION
+#==============================================================================
+owncloud_data_directory: '/var/www/owncloud/data'
+owncloud_www_directory: '/var/www/owncloud'
+
+
+# ADDITIONAL PACKAGES MANAGEMENT
+#==============================================================================
+
+# Webserver configuration
+#------------------------
+owncloud_webserver_managed_by_this_role: True
+
+owncloud_webserver_cn: ''
+owncloud_webserver_modules_required:
+  - ssl
+owncloud_webserver_name: 'apache' # Only Apache managed today
+owncloud_webserver_packages_state: 'present'
+owncloud_webserver_remove_existing_endpoints: True
+owncloud_webserver_use_only_ssl: True
+
+# SSL management
+owncloud_webserver_ssl_certificate:
+  directory:
+    name: '/etc/ssl/certs'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  file:
+    name: 'owncloud.pem'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+owncloud_webserver_ssl_certificate_content: ''
+
+owncloud_webserver_ssl_private_key:
+  directory:
+    name: '/etc/ssl/private'
+    owner: 'root'
+    group: 'ssl-cert'
+    mode: '0710'
+  file:
+    name: 'owncloud.key'
+    owner: 'root'
+    group: 'ssl-cert'
+    mode: '0640'
+owncloud_webserver_ssl_private_key_content: ''
+
+# VHOST management
+owncloud_webserver_vhost_file_name: 'owncloud.conf'
+owncloud_webserver_vhosts:
+  - alias: []
+    name: "{{ owncloud_webserver_cn or ansible_fqdn }}"
+    ip: '*'
+    use_ssl: True
+    port: 443
+

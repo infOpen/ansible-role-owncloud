@@ -1,0 +1,153 @@
+---
+
+# Tasks about webserver configuration if needed
+
+- name: Install webserver packages
+  become: True
+  package:
+    name: "{{ item.1 }}"
+    state: "{{ owncloud_webserver_packages_state }}"
+  notify: restart webserver
+  with_subelements:
+    - owncloud_webserver_management
+    - packages
+  when:
+    - item.0.name == owncloud_webserver_name
+
+
+- name: Delete default endpoints
+  become: True
+  file:
+    path: "{{ item.1 }}"
+    state: absent
+  notify: restart webserver
+  with_subelements:
+    - owncloud_webserver_management
+    - default_endpoints
+  when:
+    - item.0.name == owncloud_webserver_name
+
+
+- name: Create vhost configuration file
+  become: True
+  template:
+    src: "{{ role_path ~ '/templates/' ~ owncloud_webserver_name
+              ~ '_vhost.conf.j2' }}"
+    dest: "{{ item.vhost_destination
+                ~ '/' ~ owncloud_webserver_vhost_file_name }}"
+    owner: "{{ item.vhost_file.owner }}"
+    group: "{{ item.vhost_file.group }}"
+    mode: "{{ item.vhost_file.mode }}"
+  notify: restart webserver
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Create symlink to activate vhost
+  become: True
+  file:
+    src: "{{ item.vhost_destination
+              ~ '/' ~ owncloud_webserver_vhost_file_name }}"
+    dest: "{{ item.vhost_symlink_destination
+                ~ '/' ~ owncloud_webserver_vhost_file_name }}"
+    state: link
+  notify: restart webserver
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+    - item.vhost_symlink_destination
+
+
+- name: Remove port 80 listening
+  become: True
+  lineinfile:
+    backrefs: True
+    dest: "{{ item.1 }}"
+    line: '# Comment by Ansible OwnCloud role\n#\1'
+    regexp: '^(Listen 80)$'
+    state: present
+  notify: restart webserver
+  with_subelements:
+    - owncloud_webserver_management
+    - port_configuration_files
+  when:
+    - item.0.name == owncloud_webserver_name
+    - owncloud_webserver_use_only_ssl
+
+
+- name: Activate required modules
+  become: True
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  notify: restart webserver
+  with_items: owncloud_webserver_modules_required
+  when: owncloud_webserver_name == 'apache'
+
+
+- name: Create SSL CA certificate directory
+  become: True
+  file:
+    dest: "{{ owncloud_webserver_ssl_certificate.directory.name }}"
+    owner: "{{ owncloud_webserver_ssl_certificate.directory.owner }}"
+    group: "{{ owncloud_webserver_ssl_certificate.directory.group }}"
+    mode: "{{ owncloud_webserver_ssl_certificate.directory.mode }}"
+    state: directory
+  when: owncloud_webserver_ssl_certificate.directory.name
+
+
+- name: Create SSL CA private key directory
+  become: True
+  file:
+    dest: "{{ owncloud_webserver_ssl_private_key.directory.name }}"
+    owner: "{{ owncloud_webserver_ssl_private_key.directory.owner }}"
+    group: "{{ owncloud_webserver_ssl_private_key.directory.group }}"
+    mode: "{{ owncloud_webserver_ssl_private_key.directory.mode }}"
+    state: directory
+  when: owncloud_webserver_ssl_private_key.directory.name
+
+
+- name: Create SSL CA certificate file with user data
+  become: True
+  copy:
+    content: "{{ owncloud_webserver_ssl_certificate_content }}"
+    dest: "{{ owncloud_webserver_ssl_certificate.directory.name
+                ~ '/' owncloud_webserver_ssl_certificate.file.name }}"
+    owner: "{{ owncloud_webserver_ssl_certificate.file.owner }}"
+    group: "{{ owncloud_webserver_ssl_certificate.file.group }}"
+    mode: "{{ owncloud_webserver_ssl_certificate.file.mode }}"
+  notify: restart webserver
+  when: owncloud_webserver_ssl_certificate_content
+
+
+- name: Create SSL CA private key file with user data
+  become: True
+  copy:
+    content: "{{ owncloud_webserver_ssl_private_key_content }}"
+    dest: "{{ owncloud_webserver_ssl_private_key.directory.name
+                ~ '/' ~ owncloud_webserver_ssl_private_key.file.name }}"
+    owner: "{{ owncloud_webserver_ssl_private_key.file.owner }}"
+    group: "{{ owncloud_webserver_ssl_private_key.file.group }}"
+    mode: "{{ owncloud_webserver_ssl_private_key.file.mode }}"
+  notify: restart webserver
+  when: owncloud_webserver_ssl_private_key_content
+
+
+- name: Create self signed certificate and private key
+  become: True
+  command: "openssl req -new \
+              -subj '/CN={{ owncloud_webserver_cn or ansible_fqdn }}' \
+              -newkey rsa:2048 -sha512 -days 3650 -nodes -x509 \
+              -keyout {{ owncloud_webserver_ssl_private_key.directory.name
+                ~ '/' ~ owncloud_webserver_ssl_private_key.file.name }} \
+              -out {{ owncloud_webserver_ssl_certificate.directory.name
+                ~ '/' ~ owncloud_webserver_ssl_certificate.file.name }}"
+  args:
+    creates: "{{ owncloud_webserver_ssl_certificate.directory.name
+                  ~ '/' ~ owncloud_webserver_ssl_certificate.file.name }}"
+  notify: restart webserver
+  when:
+    - owncloud_webserver_ssl_certificate_content == ''
+    - owncloud_webserver_ssl_private_key_content == ''
+

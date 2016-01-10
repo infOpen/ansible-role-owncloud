@@ -11,7 +11,30 @@ owncloud_repository_apt_source_url: "{{ owncloud_repository_base_url
 # Owncloud GPG key URL for distribution
 owncloud_repository_apt_key_url: "{{ owncloud_repository_apt_source_url
                                       ~ 'Release.key' }}"
+
+# Packages name
 owncloud_packages:
   - owncloud
   - owncloud-server
+
+# All distribution settings about webserver management
+owncloud_webserver_management:
+  - name: apache
+    packages:
+      - apache2
+    default_endpoints:
+      - '/etc/apache2/sites-available/000-default.conf'
+      - '/etc/apache2/sites-available/default-ssl.conf'
+      - '/etc/apache2/sites-enabled/000-default.conf'
+      - '/etc/apache2/conf-available/owncloud.conf'
+      - '/etc/apache2/conf-enabled/owncloud.conf'
+    port_configuration_files:
+      - '/etc/apache2/ports.conf'
+    service_name: 'apache2'
+    vhost_destination: '/etc/apache2/sites-available'
+    vhost_symlink_destination: '/etc/apache2/sites-enabled'
+    vhost_file:
+      owner: 'root'
+      group: 'root'
+      mode: '0644'
 

@@ -26,3 +26,11 @@
     - install
     - owncloud
 
+
+- name: Include webserver management
+  include: "tasks/webserver_management.yml"
+  tags:
+    - install
+    - owncloud
+  when: owncloud_webserver_managed_by_this_role
+

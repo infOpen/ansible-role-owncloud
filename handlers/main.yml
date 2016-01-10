@@ -2,3 +2,12 @@
 
 # Handlers main file for owncloud role
 
+- name: restart webserver
+  become: True
+  service:
+    name: "{{ item.service_name }}"
+    state: restarted
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+

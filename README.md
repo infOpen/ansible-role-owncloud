@@ -36,9 +36,13 @@ This role contains two tests methods :
 
 ### Default role variables
 
-    # Installation variables
-    #-----------------------
+    # INSTALLATION VARIABLES
+    #==========================================================================
     owncloud_repository_key_id: 'BCECA90325B072AB1245F739AB7C32C35180350A'
+
+    # Base URL of OwnCloud downloads, used to build distribution URL
+    owncloud_repository_base_url: "{{ 'https://download.owncloud.org/download'
+                                        ~ '/repositories/' }}"
 
     # Repository urls can be customized, else default distribution used
     owncloud_repository_key_url: ''
@@ -51,24 +55,102 @@ This role contains two tests methods :
 
     owncloud_version: 8.2
     owncloud_package_state: 'present'
-    owncloud_webserver_service_name: 'apache2'
+
+
+    # GENERAL CONFIGURATION
+    #==========================================================================
+    owncloud_data_directory: '/var/www/owncloud/data'
+    owncloud_www_directory: '/var/www/owncloud'
+
+
+    # ADDITIONAL PACKAGES MANAGEMENT
+    #==========================================================================
+
+    # Webserver configuration
+    #------------------------
+    owncloud_webserver_managed_by_this_role: True
+
+    owncloud_webserver_cn: ''
+    owncloud_webserver_modules_required:
+      - ssl
+    owncloud_webserver_name: 'apache' # Only Apache managed today
+    owncloud_webserver_packages_state: 'present'
+    owncloud_webserver_remove_existing_endpoints: True
+    owncloud_webserver_use_only_ssl: True
+
+    # SSL management
+    owncloud_webserver_ssl_certificate:
+      directory:
+        name: '/etc/ssl/certs'
+        owner: 'root'
+        group: 'root'
+        mode: '0755'
+      file:
+        name: 'owncloud.pem'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+    owncloud_webserver_ssl_certificate_content: ''
+
+    owncloud_webserver_ssl_private_key:
+      directory:
+        name: '/etc/ssl/private'
+        owner: 'root'
+        group: 'ssl-cert'
+        mode: '0710'
+      file:
+        name: 'owncloud.key'
+        owner: 'root'
+        group: 'ssl-cert'
+        mode: '0640'
+    owncloud_webserver_ssl_private_key_content: ''
+
+    # VHOST management
+    owncloud_webserver_vhost_file_name: 'owncloud.conf'
+    owncloud_webserver_vhosts:
+      - alias: []
+        name: "{{ owncloud_webserver_cn or ansible_fqdn }}"
+        ip: '*'
+        use_ssl: True
+        port: 443
 
 ### Ubuntu distribution vars
 
-    owncloud_repository_apt_base: "{{ 'https://download.owncloud.org/download'
-                                        ~ '/repositories/' }}"
-    owncloud_repository_apt_source_url: "{{ owncloud_repository_apt_base
+    # OwnCloud APT repository URL
+    owncloud_repository_apt_source_url: "{{ owncloud_repository_base_url
                                             ~ owncloud_version
                                             ~ '/Ubuntu_'
                                             ~ ansible_distribution_version }}/"
-    owncloud_repository_apt_key_url: "{{ owncloud_repository_apt_base
-                                          ~ owncloud_version
-                                          ~ '/Ubuntu_'
-                                          ~ ansible_distribution_version
-                                          ~ '/Release.key' }}"
+
+    # Owncloud GPG key URL for distribution
+    owncloud_repository_apt_key_url: "{{ owncloud_repository_apt_source_url
+                                          ~ 'Release.key' }}"
+
+    # Packages name
     owncloud_packages:
       - owncloud
       - owncloud-server
+
+    # All distribution settings about webserver management
+    owncloud_webserver_management:
+      - name: apache
+        packages:
+          - apache2
+        default_endpoints:
+          - '/etc/apache2/sites-available/000-default.conf'
+          - '/etc/apache2/sites-available/default-ssl.conf'
+          - '/etc/apache2/sites-enabled/000-default.conf'
+          - '/etc/apache2/conf-available/owncloud.conf'
+          - '/etc/apache2/conf-enabled/owncloud.conf'
+        port_configuration_files:
+          - '/etc/apache2/ports.conf'
+        service_name: 'apache2'
+        vhost_destination: '/etc/apache2/sites-available'
+        vhost_symlink_destination: '/etc/apache2/sites-enabled'
+        vhost_file:
+          owner: 'root'
+          group: 'root'
+          mode: '0644'
 
 ## Dependencies
 
