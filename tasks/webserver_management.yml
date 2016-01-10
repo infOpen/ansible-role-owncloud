@@ -16,6 +16,12 @@
 
 
 # Not needed, but Travis return permission denied :/
+- name: Add debug
+  become: True
+  command: "ls -lhaR /etc/apache2"
+  register: travis_debug_1
+- debug:
+    var: travis_debug_1
 - name: Change default endpoints permissions
   become: True
   file:
