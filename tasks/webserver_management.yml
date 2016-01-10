@@ -15,6 +15,20 @@
     - item.0.name == owncloud_webserver_name
 
 
+# Not needed, but Travis return permission denied :/
+- name: Change default endpoints permissions
+  become: True
+  file:
+    path: "{{ item.1 }}"
+    mode: '0666'
+  notify: restart webserver
+  with_subelements:
+    - owncloud_webserver_management
+    - default_endpoints
+  when:
+    - item.0.name == owncloud_webserver_name
+
+
 - name: Delete default endpoints
   become: True
   file:
