@@ -134,6 +134,11 @@ This role contains two tests methods :
     # All distribution settings about webserver management
     owncloud_webserver_management:
       - name: apache
+        folders:
+          conf_enabled: '/etc/apache2/conf-enabled'
+          site_enabled: '/etc/apache2/site-enabled'
+          vhost_destination: '/etc/apache2/sites-available'
+          vhost_symlink_destination: '/etc/apache2/sites-enabled'
         packages:
           - apache2
         default_endpoints:
@@ -145,8 +150,6 @@ This role contains two tests methods :
         port_configuration_files:
           - '/etc/apache2/ports.conf'
         service_name: 'apache2'
-        vhost_destination: '/etc/apache2/sites-available'
-        vhost_symlink_destination: '/etc/apache2/sites-enabled'
         vhost_file:
           owner: 'root'
           group: 'root'

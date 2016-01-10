@@ -15,16 +15,31 @@
     - item.0.name == owncloud_webserver_name
 
 
-- name: Delete default endpoints
+- name: Disable default site endpoints
   become: True
-  file:
-    path: "{{ item.1 }}"
-    state: absent
+  command: "a2dissite {{ item.1 }}"
+  args:
+    removes: "{{ item.0.folders.site_enabled }}/{{ item.1}}.conf"
   notify: restart webserver
   with_subelements:
     - owncloud_webserver_management
-    - default_endpoints
+    - default_site_endpoints
   when:
+    - owncloud_webserver_name == 'apache'
+    - item.0.name == owncloud_webserver_name
+
+
+- name: Disable default configuration endpoints
+  become: True
+  command: "a2disconf {{ item.1 }}"
+  args:
+    removes: "{{ item.0.folders.conf_enabled }}/{{ item.1}}.conf"
+  notify: restart webserver
+  with_subelements:
+    - owncloud_webserver_management
+    - default_conf_endpoints
+  when:
+    - owncloud_webserver_name == 'apache'
     - item.0.name == owncloud_webserver_name
 
 
@@ -33,7 +48,7 @@
   template:
     src: "{{ role_path ~ '/templates/' ~ owncloud_webserver_name
               ~ '_vhost.conf.j2' }}"
-    dest: "{{ item.vhost_destination
+    dest: "{{ item.folders.vhost_destination
                 ~ '/' ~ owncloud_webserver_vhost_file_name }}"
     owner: "{{ item.vhost_file.owner }}"
     group: "{{ item.vhost_file.group }}"
@@ -47,16 +62,16 @@
 - name: Create symlink to activate vhost
   become: True
   file:
-    src: "{{ item.vhost_destination
+    src: "{{ item.folders.vhost_destination
               ~ '/' ~ owncloud_webserver_vhost_file_name }}"
-    dest: "{{ item.vhost_symlink_destination
+    dest: "{{ item.folders.vhost_symlink_destination
                 ~ '/' ~ owncloud_webserver_vhost_file_name }}"
     state: link
   notify: restart webserver
   with_items: owncloud_webserver_management
   when:
     - item.name == owncloud_webserver_name
-    - item.vhost_symlink_destination
+    - item.folders.vhost_symlink_destination
 
 
 - name: Remove port 80 listening
