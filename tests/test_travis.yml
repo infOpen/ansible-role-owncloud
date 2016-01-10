@@ -3,7 +3,7 @@
 # Tests for owncloud role
 
 - hosts: localhost
-  remote_user: root
+  remote_user: travis
   roles:
     - "infOpen/ansible-role-owncloud"
   post_tasks:
