@@ -5,10 +5,8 @@
 - name: Check if Owncloud already installed
   become: True
   become_user: "{{ item.user }}"
-  shell: "php occ status | grep -c 'installed: true'"
-  args:
-    chdir: "{{ owncloud_www_directory }}"
-  changed_when: False
+  stat:
+    path: "{{ owncloud_www_directory }}/config/config.php"
   register: owncloud_check_installed
   with_items: owncloud_webserver_management
   when:
@@ -35,7 +33,7 @@
   with_items: owncloud_webserver_management
   when:
     - item.name == owncloud_webserver_name
-    - owncloud_check_installed.results.0.stdout != '1'
+    - owncloud_check_installed.results.0.stat.size == 0
 
 
 - name: Check if Owncloud already to latest version
