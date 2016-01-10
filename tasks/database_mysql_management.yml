@@ -1,0 +1,111 @@
+---
+
+# Mysql server management if needed
+
+- name: Install database packages
+  become: True
+  package:
+    name: "{{ item.1 }}"
+    state: "{{ owncloud_webserver_packages_state }}"
+  notify: restart webserver
+  with_subelements:
+    - owncloud_database_management
+    - packages
+  when:
+    - item.0.name == owncloud_database_engine
+
+
+- name: Check if mysql root credentials file exists
+  become: True
+  stat:
+    path: '/root/.my.cnf'
+  register: owncloud_database_root_credentials_file
+
+
+- name: Generate random root passwords
+  become: True
+  mysql_user:
+    check_implicit_admin: True
+    host: 'localhost'
+    login_password: "{{ lookup('password', '/tmp/root_mysqlpassword ') }}"
+    name: 'root'
+    password: "{{ lookup('password', '/tmp/root_mysqlpassword ') }}"
+  with_items:
+    - 'localhost'
+    - '127.0.0.1'
+    - '::1'
+  when: owncloud_database_root_credentials_file.stat.exists == False
+
+
+- name: Create mysql root credentials file
+  become: True
+  template:
+    src: "{{ role_path }}/templates/mysql_credentials.cnf.j2"
+    dest: '/root/.my.cnf'
+    owner: 'root'
+    group: 'root'
+    mode: '0400'
+  with_items:
+    - 'root'
+  when: owncloud_database_root_credentials_file.stat.exists == False
+
+
+- name: Generate mysql configuration
+  become: True
+  template:
+    src: "{{ role_path }}/templates/mysql_configuration.cnf.j2"
+    dest: "{{ item.1.dest }}"
+    owner: "{{ item.1.owner }}"
+    group: "{{ item.1.group }}"
+    mode: "{{ item.1.mode }}"
+  with_subelements:
+    - owncloud_database_management
+    - files
+  when:
+    - item.0.name == owncloud_database_engine
+    - item.1.type == 'configuration'
+
+
+- name: Create database
+  become: True
+  mysql_db:
+    collation: "{{ owncloud_database_collation }}"
+    encoding: "{{ owncloud_database_encoding }}"
+    name: "{{ owncloud_database_name }}"
+    state: 'present'
+
+
+- name: Check if mysql root credentials file exists
+  become: True
+  stat:
+    path: '/root/.{{ owncloud_database_user }}_my.cnf'
+  register: owncloud_database_owncloud_user_credentials_file
+
+
+- name: Generate random owncloud passwords
+  become: True
+  mysql_user:
+    host: "{{ item }}"
+    name: "{{ owncloud_database_user }}"
+    password: "{{ lookup('password',
+                  '/tmp/{{ owncloud_database_user }}_mysqlpassword ') }}"
+    priv: "{{ owncloud_database_name }}.*:ALL"
+  with_items:
+    - 'localhost'
+    - '127.0.0.1'
+    - '::1'
+  when: owncloud_database_owncloud_user_credentials_file.stat.exists == False
+
+
+- name: Create mysql owncloud credentials file
+  become: True
+  template:
+    src: "{{ role_path }}/templates/mysql_credentials.cnf.j2"
+    dest: '/root/.{{ owncloud_database_user }}_my.cnf'
+    owner: 'root'
+    group: 'root'
+    mode: '0400'
+  with_items:
+    - "{{ owncloud_database_user }}"
+  when: owncloud_database_owncloud_user_credentials_file.stat.exists == False
+

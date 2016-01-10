@@ -47,3 +47,18 @@ owncloud_webserver_management:
       group: 'root'
       mode: '0644'
 
+# All distribution settings about database server management
+owncloud_database_management:
+  - name: 'mysql'
+    files:
+      - type: 'configuration'
+        dest: '/etc/mysql/conf.d/owncloud.cnf'
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+    packages:
+      - 'mysql-server'
+      - 'php5-mysql'
+      - 'python-mysqldb'
+    socket: '/var/run/mysqld/mysqld.sock'
+

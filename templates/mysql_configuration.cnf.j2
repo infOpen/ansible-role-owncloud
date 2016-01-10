@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[mysqld]
+bind_address = 127.0.0.1
+client_socket = {{ item.0.socket }}
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+default-character-set=utf8
+skip-character-set-client-handshake
+
+[client]
+default-character-set=utf8
+

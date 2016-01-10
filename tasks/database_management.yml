@@ -1,0 +1,13 @@
+---
+
+# Database management tasks
+
+- name: Include database management
+  include: "tasks/database_mysql_management.yml"
+  tags:
+    - install
+    - owncloud
+    - mysql
+  when:
+    - owncloud_database_engine == 'mysql'
+

@@ -12,6 +12,7 @@ describe 'owncloud Ansible role' do
 
             it 'install role packages' do
                 packages = Array[ 'apache2', 'openssl',
+                                  'mysql-server',
                                   'owncloud', 'owncloud-server' ]
 
                 packages.each do |pkg_name|
@@ -65,6 +66,18 @@ describe 'owncloud Ansible role' do
 
                 describe port(443) do
                     it { should be_listening }
+                end
+            end
+
+            describe 'should manage Mysql configuration' do
+
+                describe process('mysqld') do
+                    it { should be_running }
+                    its(:user) { should eq 'mysql' }
+                end
+
+                describe port(3306) do
+                  it { should be_listening.on('127.0.0.1').with('tcp') }
                 end
             end
 
