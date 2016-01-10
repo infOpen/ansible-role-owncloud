@@ -19,6 +19,14 @@ before_install:
   # Make sure everything's up to date.
   - sudo apt-get update -qq
 
+  # Change apache config files permissions berore delete
+  - sudo chmod a+rwx \
+      /etc/apache2/sites-available/000-default.conf \
+      /etc/apache2/sites-available/default-ssl.conf \
+      /etc/apache2/sites-enabled/000-default.conf \
+      /etc/apache2/conf-available/owncloud.conf \
+      /etc/apache2/conf-enabled/owncloud.conf
+
 install:
   # Install ruby dependencies to run serverspec tests
   - bundle install
