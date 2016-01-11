@@ -65,7 +65,7 @@ This role contains two tests methods :
     owncloud_administrator_password: 'admin'
     owncloud_trusted_domains:
      - 'localhost'
-     - "{{ ansible_fqdn }}"
+     - "{{ owncloud_webserver_cn or ansible_fqdn }}"
 
 
     # ADDITIONAL PACKAGES MANAGEMENT

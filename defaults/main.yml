@@ -31,7 +31,7 @@ owncloud_administrator_user: 'admin'
 owncloud_administrator_password: 'admin'
 owncloud_trusted_domains:
   - 'localhost'
-  - "{{ ansible_fqdn }}"
+  - "{{ owncloud_webserver_cn or ansible_fqdn }}"
 
 
 # ADDITIONAL PACKAGES MANAGEMENT
