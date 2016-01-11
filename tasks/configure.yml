@@ -37,6 +37,55 @@
       or (owncloud_check_installed.results.0.stat.size == 0)
 
 
+# TRUSTED DOMAIN MANAGEMENT : BEGIN
+# Need to be done with this method, occ cannot set array in 8.2
+
+- name: Get trusted domains
+  become: True
+  become_user: "{{ item.user }}"
+  command: "php occ config:system:get trusted_domains"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  register: owncloud_check_trusted_domains
+  changed_when: False
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Delete trusted domains
+  become: True
+  become_user: "{{ item.user }}"
+  command: "php occ config:system:delete trusted_domains"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+    - owncloud_check_trusted_domains.results.0.stdout_lines
+        != owncloud_trusted_domains
+
+
+- name: Configure trusted domains
+  become: True
+  blockinfile:
+    dest: "{{ owncloud_www_directory }}/config/config.php"
+    block: |
+      {{ "'trusted_domains' =>" | indent(2, true) }}
+      {{ "array(" | indent(2, true) }}
+      {% for domain in owncloud_trusted_domains %}
+        {{ (loop.index0 ~ " => '" ~ domain) | indent(2, true) ~ "'," }}
+      {% endfor %}
+      {{ ")," | indent(2, true) }}
+    insertafter: "'secret' =>"
+    marker: "{{ '/* Block managed by Ansible : {mark} */' | indent(2, true) }}"
+  when:
+    - owncloud_check_trusted_domains.results.0.stdout_lines
+        != owncloud_trusted_domains
+
+# TRUSTED DOMAIN MANAGEMENT : END
+
+
 - name: Check if Owncloud already to latest version
   become: True
   become_user: "{{ item.user }}"
