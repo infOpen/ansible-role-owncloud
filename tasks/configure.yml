@@ -17,17 +17,17 @@
   become: True
   become_user: "{{ item.user }}"
   command: "php occ maintenance:install \
-              --admin-user {{ owncloud_administrator_user }} \
-              --admin-pass {{ owncloud_administrator_password }} \
-              --database {{ owncloud_database_engine }} \
-              --database-name {{ owncloud_database_name }} \
-              --database-user {{ owncloud_database_user }} \
-              --database-pass {{
+              --admin-user='{{ owncloud_administrator_user }}' \
+              --admin-pass='{{ owncloud_administrator_password }}' \
+              --database='{{ owncloud_database_engine }}' \
+              --database-name='{{ owncloud_database_name }}' \
+              --database-user='{{ owncloud_database_user }}' \
+              --database-pass='{{
                   owncloud_database_password
                   or lookup(
                     'password',
-                    '/tmp/' ~ owncloud_database_user ~ '_mysqlpassword') }} \
-              --data-dir {{ owncloud_data_directory }}"
+                    '/tmp/' ~ owncloud_database_user ~ '_mysqlpassword') }}' \
+              --data-dir='{{ owncloud_data_directory }}'"
   args:
     chdir: "{{ owncloud_www_directory }}"
   with_items: owncloud_webserver_management
