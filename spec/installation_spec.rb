@@ -37,6 +37,13 @@ describe 'owncloud Ansible role' do
                 describe file('/etc/apache2/sites-available/owncloud.conf') do
                     it { should exist }
                     it { should be_file }
+                    its(:content) {
+                        should match '<Directory "/var/www/owncloud">'
+                        should match 'DocumentRoot /var/www/owncloud'
+                        should match 'SetEnv HOME /var/www/owncloud'
+                        should match 'SetEnv HTTP_HOME /var/www/owncloud'
+                        should match '<Directory "/var/www/owncloud/data">'
+                    }
                 end
 
                 describe file('/etc/apache2/sites-enabled/owncloud.conf') do
@@ -77,11 +84,29 @@ describe 'owncloud Ansible role' do
                 end
 
                 describe port(3306) do
-                  it { should be_listening.on('127.0.0.1').with('tcp') }
+                    it { should be_listening.on('127.0.0.1').with('tcp') }
                 end
             end
 
-      end # Debian and Ubuntu describe end
+            describe 'should manage OwnCloud configuration' do
+
+                describe file('/var/www/owncloud/config/config.php') do
+                    it { should exist }
+                    it { should be_file }
+                    its(:content) {
+                        should match "'datadirectory' => '/var/www/owncloud/data'"
+                        should match "'dbname' => 'owncloud'"
+                        should match "'dbuser' => 'owncloud'"
+                        should match "'dbpassword' => '.+'"
+                        should match "'installed' => true"
+                        should match "0 => 'localhost'"
+                        should match "1 => '.+'"
+                    }
+                end
+
+            end
+
+        end # Debian and Ubuntu describe end
     end # Debian and Ubuntu if condition end
 end # Top level describe end
 
