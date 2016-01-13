@@ -94,13 +94,13 @@ describe 'owncloud Ansible role' do
                     it { should exist }
                     it { should be_file }
                     its(:content) {
-                        should match "'datadirectory' => '/var/www/owncloud/data'"
-                        should match "'dbname' => 'owncloud'"
-                        should match "'dbuser' => 'owncloud'"
-                        should match "'dbpassword' => '.+'"
-                        should match "'installed' => true"
-                        should match "0 => 'localhost'"
-                        should match "1 => '.+'"
+                        should match "'datadirectory' => '/var/www/owncloud/data',"
+                        should match "'dbname' => 'owncloud',"
+                        should match "'dbuser' => 'owncloud',"
+                        should match "'dbpassword' => '.+',"
+                        should match "'installed' => true,"
+                        should match "0 => 'localhost',"
+                        should match "1 => '.+',"
                     }
                 end
 
