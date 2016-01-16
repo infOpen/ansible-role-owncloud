@@ -90,7 +90,7 @@ describe 'owncloud Ansible role', :sudo => true do
 
             describe 'should manage OwnCloud configuration' do
 
-                describe file('/var/www/owncloud/config/config.php') do
+                describe file('/var/www/owncloud/config/config.php'), :sudo => true do
                     it { should exist }
                     it { should be_file }
                     its(:content) {
