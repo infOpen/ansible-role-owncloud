@@ -1,6 +1,6 @@
 require 'serverspec'
 
-describe 'owncloud Ansible role' do
+describe 'owncloud Ansible role', :sudo => true do
 
     if ['debian', 'ubuntu'].include?(os[:family])
         describe 'Specific Debian and Ubuntu family checks' do
