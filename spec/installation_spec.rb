@@ -90,25 +90,10 @@ describe 'owncloud Ansible role', :sudo => true do
 
             describe 'should manage OwnCloud configuration' do
 
-                describe command('whoami'), :sudo => false do
-                    its(:stdout) { should match 'travis' }
-                end
-
-                describe command('whoami') do
-                    let(:disable_sudo) { true }
-                    its(:stdout) { should match 'travis' }
-                end
-
-                describe command('whoami') do
-                    its(:stdout) { should match 'root' }
-                end
-
-                describe command('whoami') do
+                describe file('/var/www/owncloud/config/config.php') do
                     let(:disable_sudo) { false }
-                    its(:stdout) { should match 'root' }
-                end
+                    let(:sudo) { true }
 
-                describe file('/var/www/owncloud/config/config.php'), :sudo => true do
                     it { should exist }
                     it { should be_file }
                     its(:content) {
