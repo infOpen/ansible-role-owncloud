@@ -91,12 +91,12 @@ describe 'owncloud Ansible role', :sudo => true do
             describe 'should manage OwnCloud configuration' do
 
                 describe file('/var/www/owncloud/config/config.php') do
-                    let(:disable_sudo) { false }
-                    let(:sudo) { true }
-
                     it { should exist }
                     it { should be_file }
                     its(:content) {
+                        let(:disable_sudo) { false }
+                        let(:sudo) { true }
+
                         should match "'datadirectory' => '/var/www/owncloud/data',"
                         should match "'dbname' => 'owncloud',"
                         should match "'dbuser' => 'owncloud',"
