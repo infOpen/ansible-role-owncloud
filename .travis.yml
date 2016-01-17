@@ -33,7 +33,7 @@ before_install:
     && cd ..
 
   # Remove rvmsudo warning
-  - [[ $(sudo grep secure_path /etc/sudoers) ]]
+  - "[[ $(sudo grep secure_path /etc/sudoers) ]]"
     && export rvmsudo_secure_path=1
     || export rvmsudo_secure_path=0
 
