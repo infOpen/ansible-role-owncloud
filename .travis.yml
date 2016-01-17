@@ -21,7 +21,8 @@ before_install:
 
 install:
   # Install ruby dependencies to run serverspec tests
-  - bundle install
+  - sudo gem install serverspec
+    #- bundle install
 
   # Install Ansible from devel, waiting 2.0 release. Install pytest also.
   - sudo pip install paramiko PyYAML Jinja2 httplib2 six pytest
@@ -56,5 +57,5 @@ script:
 
   # Run serverspec tests
   #- bundle exec rake
-  - sudo rspec
+  - sudo serverspec
 
