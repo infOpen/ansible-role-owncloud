@@ -50,3 +50,10 @@
     - configure
     - owncloud
 
+
+- name: Include files and directories permissions
+  include: "{{role_path }}/tasks/set_file_permissions.yml"
+  tags:
+    - configure
+    - owncloud
+

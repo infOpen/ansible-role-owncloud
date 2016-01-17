@@ -1,0 +1,89 @@
+---
+
+
+# Follow the owncloud permissions management:
+# https://doc.owncloud.org/server/8.2/admin_manual/installation/installation_wizard.html#setting-strong-directory-permissions
+
+
+- name: Set root directory owned by root user
+  become: True
+  file:
+    path: "{{ owncloud_www_directory }}"
+    owner: root
+    group: "{{ item.group }}"
+  with_items: owncloud_webserver_management
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set directories owner
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type d
+      ! -path {{ owncloud_www_directory }}
+      -exec chown -c {{ item.user }}:{{ item.group }} {} \;
+  register: owncloud_owner_all_directories
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_owner_all_directories.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set files owner
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type f
+      ! -name '.htaccess' -exec chown -c {{ item.user }}:{{ item.group }} {} \;
+  register: owncloud_owner_all_files
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_owner_all_files.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set directories permissions
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type d -exec chmod -c 0750 {} \;
+  register: owncloud_permission_all_directories
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_permission_all_directories.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set files permissions
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type f
+      ! -name '.htaccess' -exec chmod -c 0640 {} \;
+  register: owncloud_permission_all_files
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_permission_all_files.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set .htaccess files owner
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type f
+      -name '.htaccess' -exec chown -c root:{{ item.group }} {} \;
+  register: owncloud_owner_htaccess
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_owner_htaccess.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+
+
+- name: Set .htaccess files mode
+  become: True
+  command: >
+    find {{ owncloud_www_directory }} -type f
+      -name '.htaccess' -exec chmod -c 0644 {} \;
+  register: owncloud_permission_htaccess
+  with_items: owncloud_webserver_management
+  changed_when: owncloud_permission_htaccess.stdout != ''
+  when:
+    - item.name == owncloud_webserver_name
+

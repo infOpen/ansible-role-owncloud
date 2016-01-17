@@ -29,6 +29,7 @@ owncloud_webserver_management:
       site_enabled: '/etc/apache2/sites-enabled'
       vhost_destination: '/etc/apache2/sites-available'
       vhost_symlink_destination: '/etc/apache2/sites-enabled'
+    group: 'www-data'
     packages:
       - 'apache2'
       - 'libapache2-mod-php5'
