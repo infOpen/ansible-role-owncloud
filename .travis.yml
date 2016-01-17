@@ -32,6 +32,11 @@ before_install:
     && sudo make install
     && cd ..
 
+  # Remove rvmsudo warning
+  - [[ $(sudo grep secure_path /etc/sudoers) ]]
+    && export rvmsudo_secure_path=1
+    || export rvmsudo_secure_path=0
+
 install:
 
   # Add ansible.cfg to pick up roles path.
