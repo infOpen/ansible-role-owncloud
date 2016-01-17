@@ -110,3 +110,50 @@
     - item.name == owncloud_webserver_name
     - owncloud_check_upgrade.results.0.stdout != '1'
 
+
+# Owncloud app management
+- name: Enable owncloud apps
+  become: True
+  become_user: "{{ item.0.user }}"
+  shell: "php occ app:enable {{ item.1 }}"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  changed_when: False
+  register: owncloud_check_upgrade
+  with_nested:
+    - owncloud_webserver_management
+    - owncloud_apps_to_enable
+  when:
+    - item.0.name == owncloud_webserver_name
+
+
+- name: Disable owncloud apps
+  become: True
+  become_user: "{{ item.0.user }}"
+  shell: "php occ app:disable {{ item.1 }}"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  changed_when: False
+  register: owncloud_check_upgrade
+  with_nested:
+    - owncloud_webserver_management
+    - owncloud_apps_to_disable
+  when:
+    - item.0.name == owncloud_webserver_name
+
+
+- name: Set apps configuration settings
+  become: True
+  become_user: "{{ item.0.user }}"
+  shell: >
+    php occ config:system:set {{ item.1.key }} --value="{{ item.1.value }}"
+  args:
+    chdir: "{{ owncloud_www_directory }}"
+  changed_when: False
+  register: owncloud_check_upgrade
+  with_nested:
+    - owncloud_webserver_management
+    - owncloud_apps_config_settings
+  when:
+    - item.0.name == owncloud_webserver_name
+

@@ -33,6 +33,14 @@ owncloud_trusted_domains:
   - 'localhost'
   - "{{ owncloud_webserver_cn or ansible_fqdn }}"
 
+# OwnCloud apps management
+#-------------------------
+owncloud_apps_to_enable: []
+owncloud_apps_to_disable: []
+owncloud_apps_config_settings:
+  - key: trashbin_retention_obligation
+    value: 180
+
 
 # ADDITIONAL PACKAGES MANAGEMENT
 #==============================================================================
