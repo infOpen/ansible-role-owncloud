@@ -1,5 +1,9 @@
 require 'serverspec'
 
+if ENV['TRAVIS']
+    set :backend, :exec
+end
+
 describe 'owncloud Ansible role' do
 
     if ['debian', 'ubuntu'].include?(os[:family])
