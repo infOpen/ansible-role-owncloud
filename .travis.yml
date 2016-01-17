@@ -19,11 +19,8 @@ before_install:
   # Make sure everything's up to date.
   - sudo apt-get update -qq
 
-install:
   # Install ruby dependencies to run serverspec tests
-  - rvmsudo gem install serverspec
-  - rvmsudo gem install rspec
-    #- bundle install
+  - rvmsudo gem install serverspec rspec
 
   # Install Ansible from devel, waiting 2.0 release. Install pytest also.
   - sudo pip install paramiko PyYAML Jinja2 httplib2 six pytest
@@ -34,6 +31,8 @@ install:
     && git submodule update
     && sudo make install
     && cd ..
+
+install:
 
   # Add ansible.cfg to pick up roles path.
   - "cp ./tests/ansible.cfg ./"
@@ -57,6 +56,5 @@ script:
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Run serverspec tests
-  #- bundle exec rake
   - rvmsudo rspec
 
