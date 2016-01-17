@@ -58,5 +58,5 @@ script:
 
   # Run serverspec tests
   #- bundle exec rake
-  - sudo rspec
+  - rvmsudo rspec
 
