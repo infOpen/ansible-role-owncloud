@@ -1,5 +1,9 @@
 require 'serverspec'
 
+if ENV['TRAVIS']
+    set :backend, :exec
+end
+
 describe 'owncloud Ansible role' do
 
     if ['debian', 'ubuntu'].include?(os[:family])
@@ -59,12 +63,8 @@ describe 'owncloud Ansible role' do
                 describe x509_private_key('/etc/ssl/private/owncloud.key') do
                     certificate = '/etc/ssl/certs/owncloud.pem'
                     it { should_not be_encrypted }
-
-                    # https://github.com/infOpen/ansible-role-owncloud/issues/1
-                    if ENV['TRAVIS'].nil?
-                        it { should be_valid }
-                        it { should have_matching_certificate(certificate) }
-                    end
+                    it { should be_valid }
+                    it { should have_matching_certificate(certificate) }
                 end
 
                 describe port(80) do
@@ -94,13 +94,13 @@ describe 'owncloud Ansible role' do
                     it { should exist }
                     it { should be_file }
                     its(:content) {
-                        should match "'datadirectory' => '/var/www/owncloud/data'"
-                        should match "'dbname' => 'owncloud'"
-                        should match "'dbuser' => 'owncloud'"
-                        should match "'dbpassword' => '.+'"
-                        should match "'installed' => true"
-                        should match "0 => 'localhost'"
-                        should match "1 => '.+'"
+                        should match "'datadirectory' => '/var/www/owncloud/data',"
+                        should match "'dbname' => 'owncloud',"
+                        should match "'dbuser' => 'owncloud',"
+                        should match "'dbpassword' => '.+',"
+                        should match "'installed' => true,"
+                        should match "0 => 'localhost',"
+                        should match "1 => '.+',"
                     }
                 end
 
