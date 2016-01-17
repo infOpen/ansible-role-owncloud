@@ -21,7 +21,7 @@ before_install:
 
 install:
   # Install ruby dependencies to run serverspec tests
-  - sudo gem install serverspec
+  - rvmsudo gem install serverspec
     #- bundle install
 
   # Install Ansible from devel, waiting 2.0 release. Install pytest also.
