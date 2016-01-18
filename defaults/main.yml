@@ -33,13 +33,16 @@ owncloud_trusted_domains:
   - 'localhost'
   - "{{ owncloud_webserver_cn or ansible_fqdn }}"
 
+# Config.php settings. Only key/values are managed today.
+# You can erase default setting with owncloud_user_config_settings dict.
+owncloud_user_config_settings: {}
+owncloud_default_config_settings:
+  trashbin_retention_obligation: 180
+
 # OwnCloud apps management
 #-------------------------
 owncloud_apps_to_enable: []
 owncloud_apps_to_disable: []
-owncloud_apps_config_settings:
-  - key: trashbin_retention_obligation
-    value: 180
 
 
 # ADDITIONAL PACKAGES MANAGEMENT

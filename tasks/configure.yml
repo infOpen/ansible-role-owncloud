@@ -142,18 +142,21 @@
     - item.0.name == owncloud_webserver_name
 
 
-- name: Set apps configuration settings
+- name: Set configuration settings
   become: True
   become_user: "{{ item.0.user }}"
   shell: >
-    php occ config:system:set {{ item.1.key }} --value="{{ item.1.value }}"
+    php occ config:system:set {{ item.1 }}
+    --value="{{ (owncloud_default_config_settings
+                 | combine(owncloud_user_config_settings))[item.1] | trim }}"
   args:
     chdir: "{{ owncloud_www_directory }}"
   changed_when: False
   register: owncloud_check_upgrade
   with_nested:
     - owncloud_webserver_management
-    - owncloud_apps_config_settings
+    - (owncloud_default_config_settings
+       | combine(owncloud_user_config_settings)).keys()
   when:
     - item.0.name == owncloud_webserver_name
 
